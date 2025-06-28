@@ -156,7 +156,6 @@ elif choice=='Gợi ý điều khiển project 2':
 
     # Tạo một button để người dùng submit các thông tin đã chọn
     submit = st.button("Submit")
-    # Giả sử điểm trung bình của các lựa chọn >=4 thì sẽ hiển thị thông báo "Recommend", ngược lại sẽ hiển thị thông báo "Not Recommend"
     if submit:
         st.write("Bạn đã chọn công ty:", selected_company_info)
         st.write("Điểm số cho Salary & benefits:", salary_benefits)
@@ -164,15 +163,23 @@ elif choice=='Gợi ý điều khiển project 2':
         st.write("Điểm số cho Management cares about me:", management_cares)
         st.write("Điểm số cho Culture & fun:", culture_fun)
         st.write("Điểm số cho Office & workspace:", office_workspace)
-        # Tính điểm trung bình của các điểm số đã chọn
-        average_score = (salary_benefits + training_learning + management_cares + culture_fun + office_workspace) / 5
-        st.write("Điểm trung bình của các điểm số đã chọn là:", average_score)
-        # Hiển thị thông báo Recommend or Not
-        if average_score >= 3.5:
-            st.write("#### --> Recommend")
-        else:
-            st.write("#### --> Not Recommend")
-        
+        # --- Dự đoán bằng mô hình Random Forest ---
+        import pickle
+        from scipy.sparse import hstack
+        with open('output/recommend_rf.pkl', 'rb') as f:
+            pipeline = pickle.load(f)
+        model = pipeline['model']
+        vectorizer = pipeline['vectorizer']
+        scaler = pipeline['scaler']
+        features = pipeline['features']
+        # Nếu muốn nhập thêm nội dung review, có thể thêm text_input ở đây
+        review_content = ""  # hoặc st.text_input("Nhập nội dung review (bằng tiếng Anh, có thể để trống)")
+        X_text = vectorizer.transform([review_content])
+        X_num = scaler.transform([[salary_benefits, training_learning, management_cares, culture_fun, office_workspace]])
+        X_input = hstack([X_text, X_num])
+        pred = model.predict(X_input)[0]
+        proba = model.predict_proba(X_input)[0, 1]
+        st.write(f"#### --> {'Recommend' if pred==1 else 'Not Recommend'} (Xác suất: {proba:.2f})")
         # vẽ biểu đồ cột thể hiện điểm số của từng lựa chọn        
         scores = {
             'Salary & benefits': salary_benefits,
@@ -188,16 +195,3 @@ elif choice=='Gợi ý điều khiển project 2':
         plt.xticks(rotation=45)
         st.pyplot(plt)
    
-# Done
-    
-    
-    
-        
-
-        
-        
-
-    
-
-
-
