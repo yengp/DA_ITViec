@@ -28,7 +28,7 @@ st.markdown("""
 # --- Sidebar: Logo, Menu và Thông tin học viên ---
 with st.sidebar:
     # 0. Logo nhỏ ở đầu sidebar
-    st.image("img\your_logo.jpg", width=60)
+    st.image("img/your_logo.jpg", width=60)
     # 1. Tiêu đề sidebar ngắn gọn
     st.markdown("<h3 style='margin-bottom:0.5rem;'>IT Recommendation System</h3>", unsafe_allow_html=True)
     # 2. Thanh select box
